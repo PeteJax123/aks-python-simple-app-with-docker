@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: chatgpt-python-app
-          image: kubecentral.azurecr.io/chatgpt_python_app
+          image: <acr-login-server>/chatgpt_python_app
           ports:
             - containerPort: 5000
 ---
