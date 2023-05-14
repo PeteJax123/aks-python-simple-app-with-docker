@@ -1,0 +1,53 @@
+# Use the official Python image as the base image
+FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code into the container
+COPY . .
+
+# Expose the port on which the application will run
+EXPOSE 5000
+
+# Set the entry point to the Flask application
+CMD ["python", "chatgpt_python_flask_app.py"]
+
+root@RG05-VM01:~/chatgpt# cat chatgpt-python-app-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatgpt-python-app
+spec:
+  replicas: 3  # Number of desired pods
+  selector:
+    matchLabels:
+      app: chatgpt-python-app
+  template:
+    metadata:
+      labels:
+        app: chatgpt-python-app
+    spec:
+      containers:
+        - name: chatgpt-python-app
+          image: kubecentral.azurecr.io/chatgpt_python_app
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatgpt-python-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: chatgpt-python-app
